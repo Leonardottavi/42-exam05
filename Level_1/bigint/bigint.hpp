@@ -2,12 +2,20 @@
 #define BIGINT_HPP
 #include <iostream>
 #include <string>
+#include <sstream>
 
 class bigint {
     std::string value;
+
+    std::string to_string(unsigned long num) const {
+        std::ostringstream oss;
+        oss << num;
+        return oss.str();
+    }
+
 public:
     bigint() : value("0") {}
-    bigint(unsigned long long num) : value(std::to_string(num)) {}
+    bigint(unsigned long num) : value(to_string(num)) {}
     bigint(const std::string& str) : value(str.empty() ? "0" : str) {}
 
     bigint operator+(const bigint& other) const;
