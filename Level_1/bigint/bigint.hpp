@@ -2,40 +2,49 @@
 #define BIGINT_HPP
 #include <iostream>
 #include <string>
-#include <sstream>
+#include <algorithm>
 
 class bigint {
-    std::string value;
+    std::string v;
 
-    std::string to_string(unsigned long num) const {
-        std::ostringstream oss;
-        oss << num;
-        return oss.str();
+    std::string add(const std::string& a, const std::string& b) const {
+        std::string r;
+        int c = 0, i = a.size() - 1, j = b.size() - 1;
+        while (i >= 0 || j >= 0 || c) {
+            int s = c + (i >= 0 ? a[i--] - '0' : 0) + (j >= 0 ? b[j--] - '0' : 0);
+            r.push_back('0' + s % 10);
+            c = s / 10;
+        }
+        std::reverse(r.begin(), r.end());
+        return r;
     }
 
 public:
-    bigint() : value("0") {}
-    bigint(unsigned long num) : value(to_string(num)) {}
-    bigint(const std::string& str) : value(str.empty() ? "0" : str) {}
+    bigint() : v("0") {}
+    bigint(unsigned long n) {
+        if (n == 0) v = "0";
+        else { v = ""; while (n) { v = char('0' + n % 10) + v; n /= 10; } }
+    }
+    bigint(const std::string& s) : v(s.empty() ? "0" : s) {}
 
-    bigint operator+(const bigint& other) const;
-    bigint& operator+=(const bigint& other) { return *this = *this + other; }
+    bigint operator+(const bigint& o) const { return bigint(add(v, o.v)); }
+    bigint& operator+=(const bigint& o) { v = add(v, o.v); return *this; }
 
-    bigint operator<<(size_t shift) const { bigint result(*this); result.value.append(shift, '0'); return result; }
-    bigint& operator<<=(size_t shift) { value.append(shift, '0'); return *this; }
-    bigint operator>>(size_t shift) const { return shift >= value.length() ? bigint(0) : bigint(value.substr(0, value.length() - shift)); }
-    bigint& operator>>=(size_t shift) { shift >= value.length() ? value = "0" : value = value.substr(0, value.length() - shift); return *this; }
+    bigint operator<<(size_t s) const { return bigint(v + std::string(s, '0')); }
+    bigint& operator<<=(size_t s) { v += std::string(s, '0'); return *this; }
+    bigint operator>>(size_t s) const { return s >= v.size() ? bigint() : bigint(v.substr(0, v.size() - s)); }
+    bigint& operator>>=(size_t s) { v = (s >= v.size()) ? "0" : v.substr(0, v.size() - s); return *this; }
 
-    bool operator<(const bigint& other) const { return value.length() != other.value.length() ? value.length() < other.value.length() : value < other.value; }
-    bool operator>(const bigint& other) const { return other < *this; }
-    bool operator<=(const bigint& other) const { return !(other < *this); }
-    bool operator>=(const bigint& other) const { return !(*this < other); }
-    bool operator==(const bigint& other) const { return value == other.value; }
-    bool operator!=(const bigint& other) const { return !(*this == other); }
+    bool operator<(const bigint& o) const { return v.size() != o.v.size() ? v.size() < o.v.size() : v < o.v; }
+    bool operator>(const bigint& o) const { return o < *this; }
+    bool operator<=(const bigint& o) const { return !(o < *this); }
+    bool operator>=(const bigint& o) const { return !(*this < o); }
+    bool operator==(const bigint& o) const { return v == o.v; }
+    bool operator!=(const bigint& o) const { return v != o.v; }
 
     bigint& operator++() { return *this += bigint(1); }
-    bigint operator++(int) { bigint temp(*this); ++(*this); return temp; }
+    bigint operator++(int) { bigint t(*this); ++(*this); return t; }
 
-    friend std::ostream& operator<<(std::ostream& os, const bigint& num) { return os << num.value; }
+    friend std::ostream& operator<<(std::ostream& os, const bigint& x) { return os << x.v; }
 };
 #endif
