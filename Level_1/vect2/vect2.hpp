@@ -8,8 +8,11 @@ public:
     vect2() { _data[0] = _data[1] = 0; }
     vect2(int x, int y) { _data[0] = x; _data[1] = y; }
     vect2(const vect2& o) { _data[0] = o._data[0]; _data[1] = o._data[1]; }
-
-    vect2& operator=(const vect2& o) { _data[0] = o._data[0]; _data[1] = o._data[1]; return *this; }
+    vect2& operator=(const vect2& o) {
+        if (this != &o) { _data[0] = o._data[0]; _data[1] = o._data[1]; }
+        return *this;
+    }
+    ~vect2() {}
 
     int& operator[](int i) { return _data[i]; }
     const int& operator[](int i) const { return _data[i]; }
