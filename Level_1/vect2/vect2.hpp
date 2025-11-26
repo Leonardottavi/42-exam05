@@ -3,27 +3,27 @@
 #include <iostream>
 
 class vect2 {
-	int data[2];
+	int x, y;
 public:
-	vect2(){data[0]=data[1]=0;}
-	vect2(int x,int y){data[0]=x;data[1]=y;}
-	vect2(const vect2& other){data[0]=other.data[0];data[1]=other.data[1];}
-	vect2& operator=(const vect2& other){if(this!=&other){data[0]=other.data[0];data[1]=other.data[1];}return *this;}
+	vect2():x(0),y(0){}
+	vect2(int a,int b):x(a),y(b){}
+	vect2(const vect2& other):x(other.x),y(other.y){}
+	vect2& operator=(const vect2& other){x=other.x;y=other.y;return *this;}
 	~vect2(){}
-	int& operator[](int i){return data[i];}
-	const int& operator[](int i)const{return data[i];}
-	vect2 operator+(const vect2& other)const{return vect2(data[0]+other.data[0],data[1]+other.data[1]);}
-	vect2 operator-(const vect2& other)const{return vect2(data[0]-other.data[0],data[1]-other.data[1]);}
-	vect2 operator*(int scalar)const{return vect2(data[0]*scalar,data[1]*scalar);}
-	vect2& operator+=(const vect2& other){data[0]+=other.data[0];data[1]+=other.data[1];return *this;}
-	vect2& operator-=(const vect2& other){data[0]-=other.data[0];data[1]-=other.data[1];return *this;}
-	vect2& operator++(){++data[0];++data[1];return *this;}
-	vect2& operator--(){--data[0];--data[1];return *this;}
-	vect2 operator++(int){vect2 temp(*this);++(*this);return temp;}
-	vect2 operator--(int){vect2 temp(*this);--(*this);return temp;}
-	bool operator==(const vect2& other)const{return data[0]==other.data[0]&&data[1]==other.data[1];}
+	int& operator[](int i){return i?y:x;}
+	const int& operator[](int i)const{return i?y:x;}
+	vect2 operator+(const vect2& other)const{return vect2(x+other.x,y+other.y);}
+	vect2 operator-(const vect2& other)const{return vect2(x-other.x,y-other.y);}
+	vect2 operator*(int s)const{return vect2(x*s,y*s);}
+	vect2& operator+=(const vect2& other){x+=other.x;y+=other.y;return *this;}
+	vect2& operator-=(const vect2& other){x-=other.x;y-=other.y;return *this;}
+	vect2& operator++(){++x;++y;return *this;}
+	vect2& operator--(){--x;--y;return *this;}
+	vect2 operator++(int){vect2 t(*this);++*this;return t;}
+	vect2 operator--(int){vect2 t(*this);--*this;return t;}
+	bool operator==(const vect2& other)const{return x==other.x&&y==other.y;}
 	bool operator!=(const vect2& other)const{return !(*this==other);}
-	friend vect2 operator*(int scalar,const vect2& vec){return vec*scalar;}
-	friend std::ostream& operator<<(std::ostream& os,const vect2& vec){return os<<"{"<<vec.data[0]<<", "<<vec.data[1]<<"}";}
+	friend vect2 operator*(int s,const vect2& v){return v*s;}
+	friend std::ostream& operator<<(std::ostream& os,const vect2& v){return os<<"{"<<v.x<<", "<<v.y<<"}";}
 };
 #endif
