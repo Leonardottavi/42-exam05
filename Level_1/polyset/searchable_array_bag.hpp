@@ -15,7 +15,8 @@ public:
     ~searchable_array_bag() {}
 
     bool has(int item) const {
-        for (int i = 0; i < size; i++) if (data[i] == item) return true;
+        for (int i = 0; i < size; i++)
+			if (data[i] == item) return true;
         return false;
     }
 };
