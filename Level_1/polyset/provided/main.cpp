@@ -1,9 +1,9 @@
 #include "searchable_bag.hpp"
 
 // new code
-#include "searchable_tree_bag.hpp"
-#include "searchable_array_bag.hpp"
-#include "set.hpp"
+#include "../searchable_tree_bag.hpp"
+#include "../searchable_array_bag.hpp"
+#include "../set.hpp"
 //end new code
 
 #include <iostream>
@@ -69,4 +69,4 @@ int main(int argc, char **argv) {
   }
 
   return 0;
-} 
+}
