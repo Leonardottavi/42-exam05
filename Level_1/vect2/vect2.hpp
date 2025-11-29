@@ -23,7 +23,7 @@ public:
 	vect2 operator*(int other)const{return vect2(x*other,y*other);}
 	vect2 operator++(int){vect2 other(*this);++*this;return other;}
 	vect2 operator--(int){vect2 other(*this);--*this;return other;}
-	friend vect2 operator*(int other,const vect2& other){return other*other;}
-	friend std::ostream& operator<<(std::ostream& other,const vect2& other){return other<<"{"<<other.x<<", "<<other.y<<"}";}
+	friend vect2 operator*(int scalar,const vect2& other){return other*scalar;}
+	friend std::ostream& operator<<(std::ostream& os,const vect2& other){return os<<"{"<<other.x<<", "<<other.y<<"}";}
 };
 #endif
