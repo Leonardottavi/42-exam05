@@ -1,14 +1,18 @@
 #include "life.h"
 
-int main(int argc, char **argv) {
-    if (argc != 4) return 1;
-    
-    int width = atoi(argv[1]);
-    int height = atoi(argv[2]);
-    int iterations = atoi(argv[3]);
+int atoi(const char *s) {
+    int n = 0, sign = 1;
+    while (*s == ' ' || *s == '\t') s++;
+    if (*s == '-') { sign = -1; s++; }
+    else if (*s == '+') s++;
+    while (*s >= '0' && *s <= '9') n = n * 10 + (*s++ - '0');
+    return n * sign;
+}
 
-    if (width <= 0 || height <= 0 || iterations < 0) return 1;
-
-    game_of_life(width, height, iterations);
+int main(int ac, char **av) {
+    if (ac != 4) return 1;
+    int w = atoi(av[1]), h = atoi(av[2]), it = atoi(av[3]);
+    if (w <= 0 || h <= 0 || it < 0) return 1;
+    game_of_life(w, h, it);
     return 0;
-} 
+}
