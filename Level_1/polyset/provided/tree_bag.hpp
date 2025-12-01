@@ -5,7 +5,7 @@ protected:
     struct node {
         node *l, *r;
         int value;
-        node(int v) : l(nullptr), r(nullptr), value(v) {}
+        node(int v) : l(0), r(0), value(v) {}
     };
     node* tree;
 public:
@@ -21,4 +21,4 @@ private:
     static void destroy_tree(node*);
     static void print_node(node*);
     static node* copy_node(node*);
-}; 
+};
