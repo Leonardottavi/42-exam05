@@ -1,66 +1,62 @@
-#include "life.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
-char **create_board(int w, int h) {
-    char **b = calloc(h, sizeof(char*));
-    if (!b) return NULL;
-    for (int i = 0; i < h; i++) {
-        if (!(b[i] = calloc(w, 1))) {
-            while (i--) free(b[i]);
-            free(b);
-            return NULL;
-        }
-        for (int j = 0; j < w; j++) b[i][j] = ' ';
-    }
-    return b;
+static int	W, H;
+
+static int	count_neighbors(char *b, int x, int y)
+{
+	int count = 0;
+	for (int dy = -1; dy <= 1; dy++)
+		for (int dx = -1; dx <= 1; dx++) {
+			if (!dx && !dy) continue;
+			int nx = x + dx, ny = y + dy;
+			if (nx >= 0 && nx < W && ny >= 0 && ny < H)
+				count += b[ny * W + nx];
+		}
+	return count;
 }
 
-void free_board(char **b, int h) {
-    if (!b) return;
-    for (int i = 0; i < h; i++) free(b[i]);
-    free(b);
-}
+int	main(int argc, char **argv)
+{
+	if (argc != 4) return 1;
+	W = atoi(argv[1]);
+	H = atoi(argv[2]);
+	int iters = atoi(argv[3]);
+	if (W <= 0 || H <= 0 || iters < 0) return 1;
 
-int count_neighbors(char **b, int x, int y, int w, int h) {
-    int c = 0;
-    for (int dy = -1; dy <= 1; dy++)
-        for (int dx = -1; dx <= 1; dx++)
-            if ((dx || dy) && x + dx >= 0 && x + dx < w && y + dy >= 0 && y + dy < h)
-                c += (b[y + dy][x + dx] == '0');
-    return c;
-}
+	char *board = calloc(W * H, 1);
+	char *tmp   = calloc(W * H, 1);
 
-void game_of_life(int w, int h, int it) {
-    char **b = create_board(w, h);
-    if (!b) return;
+	/* Read commands from stdin */
+	int px = 0, py = 0, pen = 0;
+	char c;
+	while (read(0, &c, 1) == 1) {
+		if (c == 'x') { pen = !pen; if (pen) board[py * W + px] = 1; }
+		else if (c == 'w') { if (py > 0) py--; if (pen) board[py * W + px] = 1; }
+		else if (c == 's') { if (py < H-1) py++; if (pen) board[py * W + px] = 1; }
+		else if (c == 'a') { if (px > 0) px--; if (pen) board[py * W + px] = 1; }
+		else if (c == 'd') { if (px < W-1) px++; if (pen) board[py * W + px] = 1; }
+	}
 
-    char buf;
-    int x = 0, y = 0, d = 0;
-    while (read(0, &buf, 1) > 0) {
-        if (buf == 'x') d = !d;
-        else if (buf == 'w' && y > 0) y--;
-        else if (buf == 'a' && x > 0) x--;
-        else if (buf == 's' && y < h - 1) y++;
-        else if (buf == 'd' && x < w - 1) x++;
-        if (d) b[y][x] = '0';
-    }
+	/* Game of life iterations */
+	for (int it = 0; it < iters; it++) {
+		for (int y = 0; y < H; y++)
+			for (int x = 0; x < W; x++) {
+				int n = count_neighbors(board, x, y);
+				int alive = board[y * W + x];
+				tmp[y * W + x] = (alive ? (n == 2 || n == 3) : (n == 3));
+			}
+		char *swap = board; board = tmp; tmp = swap;
+	}
 
-    while (it--) {
-        char **nb = create_board(w, h);
-        if (!nb) { free_board(b, h); return; }
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                int n = count_neighbors(b, j, i, w, h);
-                if ((b[i][j] == '0' && (n == 2 || n == 3)) || (b[i][j] == ' ' && n == 3))
-                    nb[i][j] = '0';
-            }
-        }
-        free_board(b, h);
-        b = nb;
-    }
+	/* Print */
+	for (int y = 0; y < H; y++) {
+		for (int x = 0; x < W; x++)
+			putchar(board[y * W + x] ? '0' : ' ');
+		putchar('\n');
+	}
 
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++) putchar(b[i][j]);
-        putchar('\n');
-    }
-    free_board(b, h);
+	free(board); free(tmp);
+	return 0;
 }
