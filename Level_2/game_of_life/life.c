@@ -2,61 +2,31 @@
 #include <unistd.h>
 #include <stdio.h>
 
-static int	W, H;
+int W,H,*B,*T;
 
-static int	count_neighbors(char *b, int x, int y)
-{
-	int count = 0;
-	for (int dy = -1; dy <= 1; dy++)
-		for (int dx = -1; dx <= 1; dx++) {
-			if (!dx && !dy) continue;
-			int nx = x + dx, ny = y + dy;
-			if (nx >= 0 && nx < W && ny >= 0 && ny < H)
-				count += b[ny * W + nx];
-		}
-	return count;
+int	n(int x,int y) {
+	int c=0,dx,dy,nx,ny;
+	for(dy=-1;dy<2;dy++) for(dx=-1;dx<2;dx++)
+		if((dx||dy)&&(nx=x+dx)>=0&&nx<W&&(ny=y+dy)>=0&&ny<H) c+=B[ny*W+nx];
+	return c;
 }
 
-int	main(int argc, char **argv)
-{
-	if (argc != 4) return 1;
-	W = atoi(argv[1]);
-	H = atoi(argv[2]);
-	int iters = atoi(argv[3]);
-	if (W <= 0 || H <= 0 || iters < 0) return 1;
-
-	char *board = calloc(W * H, 1);
-	char *tmp   = calloc(W * H, 1);
-
-	/* Read commands from stdin */
-	int px = 0, py = 0, pen = 0;
-	char c;
-	while (read(0, &c, 1) == 1) {
-		if (c == 'x') { pen = !pen; if (pen) board[py * W + px] = 1; }
-		else if (c == 'w') { if (py > 0) py--; if (pen) board[py * W + px] = 1; }
-		else if (c == 's') { if (py < H-1) py++; if (pen) board[py * W + px] = 1; }
-		else if (c == 'a') { if (px > 0) px--; if (pen) board[py * W + px] = 1; }
-		else if (c == 'd') { if (px < W-1) px++; if (pen) board[py * W + px] = 1; }
+int	main(int ac,char**av) {
+	if(ac!=4) return 1;
+	W=atoi(av[1]); H=atoi(av[2]); int it=atoi(av[3]),px=0,py=0,p=0,k,*s; char c;
+	if(W<=0||H<=0||it<0) return 1;
+	B=calloc(W*H,4); T=calloc(W*H,4);
+	while(read(0,&c,1)==1) {
+		if     (c=='x'){p=!p;if(p)B[py*W+px]=1;}
+		else if(c=='w'){if(py>0)py--;if(p)B[py*W+px]=1;}
+		else if(c=='s'){if(py<H-1)py++;if(p)B[py*W+px]=1;}
+		else if(c=='a'){if(px>0)px--;if(p)B[py*W+px]=1;}
+		else if(c=='d'){if(px<W-1)px++;if(p)B[py*W+px]=1;}
 	}
-
-	/* Game of life iterations */
-	for (int it = 0; it < iters; it++) {
-		for (int y = 0; y < H; y++)
-			for (int x = 0; x < W; x++) {
-				int n = count_neighbors(board, x, y);
-				int alive = board[y * W + x];
-				tmp[y * W + x] = (alive ? (n == 2 || n == 3) : (n == 3));
-			}
-		char *swap = board; board = tmp; tmp = swap;
+	while(it--) {
+		for(int y=0;y<H;y++) for(int x=0;x<W;x++)
+			{k=n(x,y);T[y*W+x]=B[y*W+x]?k==2||k==3:k==3;}
+		s=B;B=T;T=s;
 	}
-
-	/* Print */
-	for (int y = 0; y < H; y++) {
-		for (int x = 0; x < W; x++)
-			putchar(board[y * W + x] ? '0' : ' ');
-		putchar('\n');
-	}
-
-	free(board); free(tmp);
-	return 0;
+	for(int y=0;y<H;y++){for(int x=0;x<W;x++)putchar(B[y*W+x]?'0':' ');putchar('\n');}
 }

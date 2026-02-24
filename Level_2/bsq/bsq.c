@@ -2,71 +2,38 @@
 #include <stdio.h>
 #include <string.h>
 
-static int	err(char **map, int n)
-{
-	while (n-- > 0) free(map[n]);
-	free(map);
-	fprintf(stderr, "map error\n");
-	return 0;
-}
+int	e(char **m, int n) { while (n-->0) free(m[n]); free(m); return fprintf(stderr,"map error\n"),0; }
 
-int	solve(FILE *f)
-{
-	int    n, cols, i, j, best, bi, bj, a, b, c;
-	char   e, o, fu, buf[4096];
-	char **map;
-	int  **dp;
-
-	if (!fgets(buf, sizeof(buf), f)) return 0;
-	if (sscanf(buf, "%d %c %c %c", &n, &e, &o, &fu) != 4 || n <= 0
-		|| e == o || e == fu || o == fu) return err(NULL, 0);
-
-	map = calloc(n, sizeof(char *));
-	dp  = calloc(n, sizeof(int *));
-	cols = -1;
-	for (i = 0; i < n; i++) {
-		if (!fgets(buf, sizeof(buf), f)) return err(map, i);
-		int len = strlen(buf);
-		if (len > 0 && buf[len - 1] == '\n') buf[--len] = '\0';
-		if (cols < 0) cols = len;
-		if (len == 0 || len != cols) return err(map, i);
-		for (j = 0; j < len; j++)
-			if (buf[j] != e && buf[j] != o) return err(map, i);
-		map[i] = strdup(buf);
-		dp[i] = calloc(cols, sizeof(int));
+int	s(FILE *f) {
+	int n,w=-1,i,j,B=0,bi=0,bj=0,a,b,c; char E,O,F,buf[4096]; char**m; int**d;
+	if (!fgets(buf,sizeof buf,f)||sscanf(buf,"%d %c %c %c",&n,&E,&O,&F)!=4||n<=0||E==O||E==F||O==F) return e(NULL,0);
+	m=calloc(n,sizeof*m); d=calloc(n,sizeof*d);
+	for (i=0;i<n;i++) {
+		if (!fgets(buf,sizeof buf,f)) return e(m,i);
+		int l=strlen(buf);
+		if (l&&buf[l-1]=='\n') buf[--l]=0;
+		if (w<0) w=l;
+		if (!l||l!=w) return e(m,i);
+		for (j=0;j<l;j++) if (buf[j]!=E&&buf[j]!=O) return e(m,i);
+		m[i]=strdup(buf); d[i]=calloc(w,sizeof**d);
 	}
-
-	best = 0; bi = 0; bj = 0;
-	for (i = 0; i < n; i++)
-		for (j = 0; j < cols; j++) {
-			if (map[i][j] == o) { dp[i][j] = 0; continue ; }
-			if (!i || !j) dp[i][j] = 1;
-			else {
-				a = dp[i-1][j]; b = dp[i][j-1]; c = dp[i-1][j-1];
-				dp[i][j] = (a < b ? (a < c ? a : c) : (b < c ? b : c)) + 1;
-			}
-			if (dp[i][j] > best) { best = dp[i][j]; bi = i-best+1; bj = j-best+1; }
-		}
-	for (i = 0; i < n; i++) free(dp[i]);
-	free(dp);
-	for (i = bi; i < bi + best; i++)
-		for (j = bj; j < bj + best; j++) map[i][j] = fu;
-	for (i = 0; i < n; i++) { puts(map[i]); free(map[i]); }
-	free(map);
-	return 1;
+	for (i=0;i<n;i++) { for (j=0;j<w;j++) {
+		if (m[i][j]==O){d[i][j]=0;continue;}
+		d[i][j]=(!i||!j)?1:(a=d[i-1][j],b=d[i][j-1],c=d[i-1][j-1],(a<b?(a<c?a:c):(b<c?b:c))+1);
+		if (d[i][j]>B){B=d[i][j];bi=i-B+1;bj=j-B+1;}
+	} }
+	for (i=0;i<n;i++) free(d[i]);
+	free(d);
+	for (i=bi;i<bi+B;i++) for (j=bj;j<bj+B;j++) m[i][j]=F;
+	for (i=0;i<n;i++){puts(m[i]);free(m[i]);} return free(m),1;
 }
 
-int	main(int argc, char **argv)
-{
-	int stdout_printed;
-
-	if (argc == 1) { solve(stdin); return 0; }
-	stdout_printed = 0;
-	for (int i = 1; i < argc; i++) {
-		FILE *f = fopen(argv[i], "r");
-		if (!f) { fprintf(stderr, "map error\n"); continue ; }
-		if (stdout_printed) puts("");
-		stdout_printed = solve(f);
-		fclose(f);
+int	main(int ac, char**av) {
+	int p=0; FILE *f;
+	if (ac==1) return s(stdin),0;
+	for (int i=1;i<ac;i++) {
+		if (!(f=fopen(av[i],"r"))) { fprintf(stderr,"map error\n"); continue; }
+		if (p) puts("");
+		p=s(f); fclose(f);
 	}
 }
