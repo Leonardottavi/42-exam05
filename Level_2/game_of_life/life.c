@@ -2,31 +2,27 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int W,H,*B,*T;
-
-int	n(int x,int y) {
-	int c=0,dx,dy,nx,ny;
-	for(dy=-1;dy<2;dy++) for(dx=-1;dx<2;dx++)
-		if((dx||dy)&&(nx=x+dx)>=0&&nx<W&&(ny=y+dy)>=0&&ny<H) c+=B[ny*W+nx];
-	return c;
-}
-
-int	main(int ac,char**av) {
-	if(ac!=4) return 1;
-	W=atoi(av[1]); H=atoi(av[2]); int it=atoi(av[3]),px=0,py=0,p=0,k,*s; char c;
-	if(W<=0||H<=0||it<0) return 1;
-	B=calloc(W*H,4); T=calloc(W*H,4);
+int	main(int ac, char **av) {
+	if (ac != 4) return 1;
+	int w=atoi(av[1]),h=atoi(av[2]),it=atoi(av[3]),x=0,y=0,p=0,n,di,dj;
+	if (w<=0||h<=0||it<0) return 1;
+	int b[h][w],nx[h][w]; char c;
+	for(int i=0;i<h;i++) for(int j=0;j<w;j++) b[i][j]=0;
 	while(read(0,&c,1)==1) {
-		if     (c=='x'){p=!p;if(p)B[py*W+px]=1;}
-		else if(c=='w'){if(py>0)py--;if(p)B[py*W+px]=1;}
-		else if(c=='s'){if(py<H-1)py++;if(p)B[py*W+px]=1;}
-		else if(c=='a'){if(px>0)px--;if(p)B[py*W+px]=1;}
-		else if(c=='d'){if(px<W-1)px++;if(p)B[py*W+px]=1;}
+		if     (c=='w'&&y>0)   y--;
+		else if(c=='s'&&y<h-1) y++;
+		else if(c=='a'&&x>0)   x--;
+		else if(c=='d'&&x<w-1) x++;
+		else if(c=='x')        p=!p;
+		if(p) b[y][x]=1;
 	}
 	while(it--) {
-		for(int y=0;y<H;y++) for(int x=0;x<W;x++)
-			{k=n(x,y);T[y*W+x]=B[y*W+x]?k==2||k==3:k==3;}
-		s=B;B=T;T=s;
+		for(int i=0;i<h;i++) for(int j=0;j<w;j++) {
+			for(n=0,di=-1;di<2;di++) for(dj=-1;dj<2;dj++)
+				n+=(di||dj)&&i+di>=0&&i+di<h&&j+dj>=0&&j+dj<w?b[i+di][j+dj]:0;
+			nx[i][j]=(b[i][j]&&(n==2||n==3))||(!b[i][j]&&n==3);
+		}
+		for(int i=0;i<h;i++) for(int j=0;j<w;j++) b[i][j]=nx[i][j];
 	}
-	for(int y=0;y<H;y++){for(int x=0;x<W;x++)putchar(B[y*W+x]?'0':' ');putchar('\n');}
+	for(int i=0;i<h;i++){for(int j=0;j<w;j++)putchar(b[i][j]?'0':' ');putchar('\n');}
 }
