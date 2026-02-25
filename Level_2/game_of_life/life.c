@@ -22,18 +22,16 @@ int	main(int ac, char **av)
 	{
 		for(int i=0;i<h;i++) for(int j=0;j<w;j++)
 		{
-			for(n=0,di=-1;di<2;di++) for(dj=-1;dj<2;dj++)
-				n+=(di||dj)&&i+di>=0&&i+di<h&&j+dj>=0&&j+dj<w?b[i+di][j+dj]:0;
-			nx[i][j]=(b[i][j]&&(n==2||n==3))||(!b[i][j]&&n==3);
+			for(n=0, di=-1; di<2; di++) for(dj=-1 ;dj<2; dj++)
+				n += (di || dj) && i+di>=0 &&i+di<h && j+dj>=0 && j+dj<w ? b[i+di][j+dj]:0;
+			nx[i][j] = (b[i][j] && (n==2 || n==3)) || (!b[i][j] && n==3);
 		}
 		for(int i=0;i<h;i++) for(int j=0;j<w;j++) b[i][j]=nx[i][j];
 	}
 	for(int i=0;i<h;i++)
-	{
 		for(int j=0;j<w;j++)putchar(b[i][j]?'0':' ');putchar('\n');
-	}
 }
-a
+
 /*
  * VARIABILI:
  * w  = larghezza (width) della griglia
